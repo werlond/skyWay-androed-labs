@@ -1,15 +1,22 @@
 <resources>
     <string name="app_name">SkyWay</string>
+    <string name="screen_title">Flight search</string>
+
     <string name="label_from">Откуда</string>
     <string name="label_to">Куда</string>
-    <string name="btn_swap">&lt;--&gt;</string>
+    <string name="btn_swap">Поменять местами</string>
+
     <string name="btn_pick_date">Дата вылета</string>
-    <string name="label_direct_only">Без пересадок</string>
-    <string name="btn_find">Найти билеты</string>
-    <string name="btn_ok">ОК</string>
+    <string name="btn_pick_return_date">Дата возвращения</string>
+    <string name="label_return_ticket">Обратный билет</string>
+
     <string name="class_economy">Эконом</string>
     <string name="class_comfort">Комфорт</string>
     <string name="class_business">Бизнес</string>
+
+    <string name="label_direct_only">Только прямые рейсы</string>
+    <string name="btn_find">Найти билеты</string>
+    <string name="btn_ok">ОК</string>
+
     <string name="notice_not_implemented">Функционал в разработке</string>
-    <string name="screen_title">Поиск рейсов</string>
 </resources>

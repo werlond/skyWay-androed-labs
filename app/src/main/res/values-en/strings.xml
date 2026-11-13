@@ -1,15 +1,22 @@
 <resources>
     <string name="app_name">SkyWay</string>
+    <string name="screen_title">Flight search</string>
+
     <string name="label_from">From</string>
     <string name="label_to">To</string>
-    <string name="btn_swap">&lt;--&gt;</string>
-    <string name="btn_pick_date">Flight date</string>
-    <string name="label_direct_only">Direct flights only</string>
-    <string name="btn_find">Find tickets</string>
-    <string name="btn_ok">OK</string>
+    <string name="btn_swap">Swap</string>
+
+    <string name="btn_pick_date">Departure date</string>
+    <string name="btn_pick_return_date">Return date</string>
+    <string name="label_return_ticket">Return ticket</string>
+
     <string name="class_economy">Economy</string>
     <string name="class_comfort">Comfort</string>
     <string name="class_business">Business</string>
-    <string name="notice_not_implemented">Feature under construction</string>
-    <string name="screen_title">Flight search</string>
+
+    <string name="label_direct_only">Direct flights only</string>
+    <string name="btn_find">Find tickets</string>
+    <string name="btn_ok">OK</string>
+
+    <string name="notice_not_implemented">Feature not implemented yet</string>
 </resources>

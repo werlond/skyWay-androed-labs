@@ -16,13 +16,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,14 +56,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.university.skyway.ui.theme.SkyWayTheme
 import java.time.Instant
 import java.time.ZoneOffset
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import com.university.skyway.R
+import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +76,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun SkyWayApp() {
@@ -88,7 +92,7 @@ fun SkyWayApp() {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
-        ){
+        ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 SearchScreen(
                     onFindClick = MaterialTheme.snackbar::notifyPlaceholder
@@ -99,14 +103,14 @@ fun SkyWayApp() {
                 )
             }
         }
-
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier,
-                 onFindClick: () -> Unit = {}) {
+fun SearchScreen(
+    modifier: Modifier = Modifier,
+    onFindClick: () -> Unit = {}
+) {
     var from by rememberSaveable { mutableStateOf("") }
     var to by rememberSaveable { mutableStateOf("") }
     var dateText by rememberSaveable { mutableStateOf("") }
@@ -114,7 +118,15 @@ fun SearchScreen(modifier: Modifier = Modifier,
     var selectedClass by rememberSaveable { mutableIntStateOf(0) }
     var directOnly by rememberSaveable { mutableStateOf(false) }
 
+    var returnTicket by rememberSaveable { mutableStateOf(false) }
+    var returnDateText by rememberSaveable { mutableStateOf("") }
+    var showReturnDatePicker by rememberSaveable { mutableStateOf(false) }
+
     val datePickerState = rememberDatePickerState()
+    val returnDatePickerState = rememberDatePickerState()
+
+    val dateFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy") }
+
     val classes = listOf(
         stringResource(R.string.class_economy),
         stringResource(R.string.class_comfort),
@@ -128,17 +140,16 @@ fun SearchScreen(modifier: Modifier = Modifier,
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(bottom = 16.dp)
         ) {
             Box(
                 modifier = Modifier
                     .background(
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(8.dp)
                     )
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
@@ -149,12 +160,14 @@ fun SearchScreen(modifier: Modifier = Modifier,
                     fontWeight = FontWeight.Bold
                 )
             }
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.screen_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -170,7 +183,10 @@ fun SearchScreen(modifier: Modifier = Modifier,
                 from = to
                 to = temp
             }) {
-                Text(stringResource(R.string.btn_swap))
+                Icon(
+                    imageVector = Icons.Filled.SwapHoriz,
+                    contentDescription = stringResource(R.string.btn_swap)
+                )
             }
             OutlinedTextField(
                 value = to,
@@ -181,14 +197,56 @@ fun SearchScreen(modifier: Modifier = Modifier,
         }
 
         Spacer(Modifier.height(16.dp))
-        OutlinedButton(
+
+        FilledTonalButton(
             onClick = { showDatePicker = true },
             modifier = Modifier.fillMaxWidth()
         ) {
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = null
+            )
+            Spacer(Modifier.width(8.dp))
             Text(
                 if (dateText.isEmpty()) stringResource(R.string.btn_pick_date)
                 else dateText
             )
+        }
+
+        Spacer(Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.label_return_ticket),
+                modifier = Modifier.weight(1f)
+            )
+            Switch(
+                checked = returnTicket,
+                onCheckedChange = { returnTicket = it }
+            )
+        }
+
+        AnimatedVisibility(visible = returnTicket) {
+            Column {
+                Spacer(Modifier.height(8.dp))
+                FilledTonalButton(
+                    onClick = { showReturnDatePicker = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = null
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        if (returnDateText.isEmpty())
+                            stringResource(R.string.btn_pick_return_date)
+                        else returnDateText
+                    )
+                }
+            }
         }
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
@@ -236,7 +294,7 @@ fun SearchScreen(modifier: Modifier = Modifier,
                         dateText = Instant.ofEpochMilli(it)
                             .atZone(ZoneOffset.UTC)
                             .toLocalDate()
-                            .toString()
+                            .format(dateFormatter)
                     }
                     showDatePicker = false
                 }) {
@@ -247,8 +305,28 @@ fun SearchScreen(modifier: Modifier = Modifier,
             DatePicker(state = datePickerState)
         }
     }
-}
 
+    if (showReturnDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showReturnDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    returnDatePickerState.selectedDateMillis?.let {
+                        returnDateText = Instant.ofEpochMilli(it)
+                            .atZone(ZoneOffset.UTC)
+                            .toLocalDate()
+                            .format(dateFormatter)
+                    }
+                    showReturnDatePicker = false
+                }) {
+                    Text(stringResource(R.string.btn_ok))
+                }
+            }
+        ) {
+            DatePicker(state = returnDatePickerState)
+        }
+    }
+}
 
 @Preview(showBackground = true, name = "Светлая тема")
 @Composable
@@ -268,7 +346,7 @@ fun SearchScreenPreviewDark() {
     SkyWayTheme(darkTheme = true, dynamicColor = false) {
         CompositionLocalProvider(
             LocalPlaceholderNotifier provides PlaceholderNotifier {}
-        ){
+        ) {
             SkyWayApp()
         }
     }

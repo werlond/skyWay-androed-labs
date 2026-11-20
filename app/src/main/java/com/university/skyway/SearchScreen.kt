@@ -1,8 +1,7 @@
 package com.university.skyway
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,15 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.FilledTonalButton
@@ -45,17 +43,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.university.skyway.ui.theme.SkyWayTheme
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    onFindClick: () -> Unit = {}
+    onTicketClick: (Ticket) -> Unit = {}
 ) {
     var from by rememberSaveable { mutableStateOf("") }
     var to by rememberSaveable { mutableStateOf("") }
@@ -68,6 +66,17 @@ fun SearchScreen(
     var returnDateText by rememberSaveable { mutableStateOf("") }
     var showReturnDatePicker by rememberSaveable { mutableStateOf(false) }
 
+    var searched by rememberSaveable { mutableStateOf(false) }
+    var searchedFrom by rememberSaveable { mutableStateOf("") }
+    var searchedTo by rememberSaveable { mutableStateOf("") }
+
+    val results = remember(searchedFrom, searchedTo) {
+        sampleTickets.filter {
+            it.from.contains(searchedFrom, ignoreCase = true) &&
+                    it.to.contains(searchedTo, ignoreCase = true)
+        }
+    }
+    var showError by rememberSaveable { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val returnDatePickerState = rememberDatePickerState()
 
@@ -79,106 +88,55 @@ fun SearchScreen(
         stringResource(R.string.class_business)
     )
 
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .statusBarsPadding()
-            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.screen_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                value = from,
-                onValueChange = { from = it },
-                label = { Text(stringResource(R.string.label_from)) },
-                modifier = Modifier.weight(1f)
-            )
-            IconButton(onClick = {
-                val temp = from
-                from = to
-                to = temp
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.SwapHoriz,
-                    contentDescription = stringResource(R.string.btn_swap)
-                )
-            }
-            OutlinedTextField(
-                value = to,
-                onValueChange = { to = it },
-                label = { Text(stringResource(R.string.label_to)) },
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        FilledTonalButton(
-            onClick = { showDatePicker = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = Icons.Filled.DateRange,
-                contentDescription = null
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                if (dateText.isEmpty()) stringResource(R.string.btn_pick_date)
-                else dateText
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.label_return_ticket),
-                modifier = Modifier.weight(1f)
-            )
-            Switch(
-                checked = returnTicket,
-                onCheckedChange = { returnTicket = it }
-            )
-        }
-
-        AnimatedVisibility(visible = returnTicket) {
+        item {
             Column {
-                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = from,
+                        onValueChange = { from = it },
+                        label = { Text(stringResource(R.string.label_from)) },
+                        modifier = Modifier.weight(1f),
+                        isError = showError && from.isBlank() && to.isBlank(),
+                    )
+                    IconButton(onClick = {
+                        val temp = from
+                        from = to
+                        to = temp
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.SwapHoriz,
+                            contentDescription = stringResource(R.string.btn_swap)
+                        )
+                    }
+                    OutlinedTextField(
+                        value = to,
+                        onValueChange = { to = it },
+                        label = { Text(stringResource(R.string.label_to)) },
+                        modifier = Modifier.weight(1f),
+                        isError = showError && from.isBlank() && to.isBlank(),
+                    )
+                }
+                if (showError && from.isBlank() && to.isBlank()) {
+                    Text(
+                        text = "Введите город отправления или прибытия",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp, start = 16.dp)
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+
                 FilledTonalButton(
-                    onClick = { showReturnDatePicker = true },
+                    onClick = { showDatePicker = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
@@ -187,47 +145,129 @@ fun SearchScreen(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        if (returnDateText.isEmpty())
-                            stringResource(R.string.btn_pick_return_date)
-                        else returnDateText
+                        if (dateText.isEmpty()) stringResource(R.string.btn_pick_date)
+                        else dateText
                     )
                 }
-            }
-        }
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+                Spacer(Modifier.height(16.dp))
 
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            classes.forEachIndexed { index, label ->
-                SegmentedButton(
-                    selected = selectedClass == index,
-                    onClick = { selectedClass = index },
-                    shape = SegmentedButtonDefaults.itemShape(index, classes.size)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(label)
+                    Text(
+                        text = stringResource(R.string.label_return_ticket),
+                        modifier = Modifier.weight(1f)
+                    )
+                    Switch(
+                        checked = returnTicket,
+                        onCheckedChange = { returnTicket = it }
+                    )
+                }
+
+                AnimatedVisibility(visible = returnTicket) {
+                    Column {
+                        Spacer(Modifier.height(8.dp))
+                        FilledTonalButton(
+                            onClick = { showReturnDatePicker = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.DateRange,
+                                contentDescription = null
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                if (returnDateText.isEmpty())
+                                    stringResource(R.string.btn_pick_return_date)
+                                else returnDateText
+                            )
+                        }
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    classes.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            selected = selectedClass == index,
+                            onClick = { selectedClass = index },
+                            shape = SegmentedButtonDefaults.itemShape(index, classes.size)
+                        ) {
+                            Text(label)
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.label_direct_only),
+                        modifier = Modifier.weight(1f)
+                    )
+                    Switch(checked = directOnly, onCheckedChange = { directOnly = it })
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+                Button(
+                    onClick = {
+                        if (from.isBlank() && to.isBlank()) {
+                            showError = true
+                            searched = false
+                        } else {
+                            showError = false
+                            searchedFrom = from
+                            searchedTo = to
+                            searched = true
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.btn_find))
                 }
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                stringResource(R.string.label_direct_only),
-                modifier = Modifier.weight(1f)
-            )
-            Switch(checked = directOnly, onCheckedChange = { directOnly = it })
-        }
-
-        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-
-        Button(
-            onClick = onFindClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.btn_find))
+        if (searched) {
+            if (results.isEmpty()) {
+                item {
+                    Text(
+                        text = "Ничего не найдено",
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                }
+            } else {
+                items(results, key = { it.id }) { ticket ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .clickable { onTicketClick(ticket) }
+                    ) {
+                        Column(Modifier.padding(16.dp)) {
+                            Text(
+                                "${ticket.from} → ${ticket.to}",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                "${ticket.airline} · ${ticket.date}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                "${ticket.price} ₽",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 

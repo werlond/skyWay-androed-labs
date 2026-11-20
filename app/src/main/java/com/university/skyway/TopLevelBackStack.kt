@@ -11,7 +11,7 @@ class TopLevelBackStack(startKey: NavKey) {
     private val backStacks = mutableMapOf<NavKey, SnapshotStateList<NavKey>>()
 
     init {
-        listOf(SearchTab, TicketsTab, AccountTab).forEach { tab ->
+        listOf(SearchTab, FavouritesTab, AccountTab).forEach { tab ->
             backStacks[tab] = mutableStateListOf(tab)
         }
     }

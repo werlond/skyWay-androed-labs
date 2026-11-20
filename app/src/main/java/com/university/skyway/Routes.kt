@@ -8,7 +8,7 @@ sealed interface Route : NavKey
 
 // Вкладки (top-level)
 @Serializable data object SearchTab : Route
-@Serializable data object TicketsTab : Route
+@Serializable data object FavouritesTab : Route
 @Serializable data object AccountTab : Route
 
 // Дочерние экраны

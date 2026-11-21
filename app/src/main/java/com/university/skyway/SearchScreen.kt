@@ -126,7 +126,7 @@ fun SearchScreen(
                 }
                 if (showError && from.isBlank() && to.isBlank()) {
                     Text(
-                        text = "Введите город отправления или прибытия",
+                        text = stringResource(R.string.search_error_empty),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 4.dp, start = 16.dp)
@@ -223,8 +223,8 @@ fun SearchScreen(
                             searched = false
                         } else {
                             showError = false
-                            searchedFrom = from
-                            searchedTo = to
+                            searchedFrom = from.trim()
+                            searchedTo = to.trim()
                             searched = true
                         }
                     },
@@ -239,7 +239,7 @@ fun SearchScreen(
             if (results.isEmpty()) {
                 item {
                     Text(
-                        text = "Ничего не найдено",
+                        text = stringResource(R.string.search_no_results),
                         modifier = Modifier.padding(top = 16.dp)
                     )
                 }

@@ -88,9 +88,9 @@ fun SkyWayApp() {
         bottomBar = {
             NavigationBar {
                 listOf(
-                    Triple(SearchTab, Icons.Filled.Search, "Поиск"),
-                    Triple(FavouritesTab, Icons.Filled.Favorite, "Избранное"),
-                    Triple(AccountTab, Icons.Filled.Person, "Аккаунт")
+                    Triple(SearchTab, Icons.Filled.Search, stringResource(R.string.tab_search)),
+                    Triple(FavouritesTab, Icons.Filled.Favorite, stringResource(R.string.tab_favorites)),
+                    Triple(AccountTab, Icons.Filled.Person, stringResource(R.string.tab_account))
                 ).forEach { (tab, icon, label) ->
                     NavigationBarItem(
                         selected = topLevelBackStack.currentTopLevel == tab,
@@ -103,7 +103,8 @@ fun SkyWayApp() {
         }
     ) { padding ->
         NavDisplay(
-            backStack = currentStack,
+            backStack = topLevelBackStack.displayStack,
+            onBack = { topLevelBackStack.goBack() },
             modifier = Modifier.padding(padding),
             transitionSpec = {
                 slideInHorizontally { it } togetherWith slideOutHorizontally { -it / 4 }

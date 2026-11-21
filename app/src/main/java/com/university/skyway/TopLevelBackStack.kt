@@ -22,6 +22,10 @@ class TopLevelBackStack(startKey: NavKey) {
     val currentStack: SnapshotStateList<NavKey>
         get() = backStacks.getValue(currentTopLevel)
 
+    val displayStack: List<NavKey>
+        get() = if (currentTopLevel == SearchTab) currentStack
+        else backStacks.getValue(SearchTab) + currentStack
+
     fun addTopLevel(key: NavKey) {
         if (key in backStacks) {
             currentTopLevel = key
@@ -37,9 +41,16 @@ class TopLevelBackStack(startKey: NavKey) {
     }
 
     fun goBack(): Boolean {
-        return if (currentStack.size > 1) {
-            currentStack.removeAt(currentStack.lastIndex)
-            true
-        } else false
+        return when {
+            currentStack.size > 1 -> {
+                currentStack.removeAt(currentStack.lastIndex)
+                true
+            }
+            currentTopLevel != SearchTab -> {
+                currentTopLevel = SearchTab
+                true
+            }
+            else -> false
+        }
     }
 }

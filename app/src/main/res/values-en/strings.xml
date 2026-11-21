@@ -19,4 +19,24 @@
     <string name="btn_ok">OK</string>
 
     <string name="notice_not_implemented">Feature not implemented yet</string>
+    <string name="common_back">Back</string>
+
+    <string name="tab_search">Search</string>
+    <string name="tab_favorites">Favorites</string>
+    <string name="tab_account">Account</string>
+
+    <string name="account_placeholder">Purchased tickets will be shown here (placeholder)</string>
+    <string name="btn_settings">Settings</string>
+    <string name="account_settings_title">Account settings</string>
+
+    <string name="favorites_placeholder">Favorite tickets will be shown here (placeholder)</string>
+
+    <string name="ticket_not_found">Ticket not found</string>
+    <string name="ticket_number">Ticket #%1$d</string>
+    <string name="ticket_date">Date: %1$s</string>
+    <string name="ticket_airline">Airline: %1$s</string>
+    <string name="ticket_price">Price: %1$d ₽</string>
+
+    <string name="search_no_results">Nothing found</string>
+    <string name="search_error_empty">Enter a departure or arrival city</string>
 </resources>

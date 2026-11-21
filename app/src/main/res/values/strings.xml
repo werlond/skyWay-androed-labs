@@ -19,4 +19,24 @@
     <string name="btn_ok">ОК</string>
 
     <string name="notice_not_implemented">Функционал в разработке</string>
+    <string name="common_back">Назад</string>
+
+    <string name="tab_search">Поиск</string>
+    <string name="tab_favorites">Избранное</string>
+    <string name="tab_account">Аккаунт</string>
+
+    <string name="account_placeholder">Здесь отображаются купленные билеты (заглушка)</string>
+    <string name="btn_settings">Настройки</string>
+    <string name="account_settings_title">Настройки аккаунта</string>
+
+    <string name="favorites_placeholder">Здесь будут избранные билеты (заглушка)</string>
+
+    <string name="ticket_not_found">Билет не найден</string>
+    <string name="ticket_number">Билет #%1$d</string>
+    <string name="ticket_date">Дата: %1$s</string>
+    <string name="ticket_airline">Авиакомпания: %1$s</string>
+    <string name="ticket_price">Цена: %1$d ₽</string>
+
+    <string name="search_no_results">Ничего не найдено</string>
+    <string name="search_error_empty">Введите город отправления или прибытия</string>
 </resources>
